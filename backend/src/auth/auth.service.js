@@ -1,13 +1,16 @@
-import jwt from 'jsonwebtoken';
-import { randomBytes } from 'node:crypto';
+import jwt from "jsonwebtoken";
+import { randomBytes } from "node:crypto";
 
 export function createToken(payload, expiresIn) {
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: expiresIn });
+  return jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: expiresIn,
+    domain: ".onrender.com",
+  });
 }
 
 export function createNumericalCode(digits) {
   const bytes = randomBytes(Math.ceil(digits / 2));
-  const code = parseInt(bytes.toString('hex'), 16).toString().slice(0, digits);
+  const code = parseInt(bytes.toString("hex"), 16).toString().slice(0, digits);
   console.log({ code });
   return code;
 }
@@ -17,8 +20,8 @@ export function verifyToken(token) {
 }
 
 export function createDefaultUsername() {
-  const bytes = randomBytes(6).toString('hex');
-  const defaultUsername = 'user_' + bytes;
+  const bytes = randomBytes(6).toString("hex");
+  const defaultUsername = "user_" + bytes;
   console.log({ defaultUsername });
   return defaultUsername;
 }
