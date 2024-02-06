@@ -1,13 +1,13 @@
-import { User } from '../users/users.model.js';
-import bcrypt from 'bcryptjs';
-import { createError } from '../utils/middleware/error.middleware.js';
+import { User } from "../users/users.model.js";
+import bcrypt from "bcryptjs";
+import { createError } from "../utils/middleware/error.middleware.js";
 import {
   createToken,
   createNumericalCode,
   createDefaultUsername,
-} from './auth.service.js';
-import { sendEmail } from '../config/email.config.js';
-import { verifyEmailTemplate as template } from '../utils/templates/email.templates.js';
+} from "./auth.service.js";
+import { sendEmail } from "../config/email.config.js";
+import { verifyEmailTemplate as template } from "../utils/templates/email.templates.js";
 
 //$ signUp ------------------------------------------------------------------
 
@@ -18,7 +18,7 @@ export const signUp = async (req, res, next) => {
     if (existingUser) {
       return res
         .status(400)
-        .json({ success: false, message: 'email already in database' });
+        .json({ success: false, message: "email already in database" });
     }
 
     let sixDigitCode = createNumericalCode(6);
@@ -26,12 +26,13 @@ export const signUp = async (req, res, next) => {
     sendEmail(template(email, sixDigitCode));
 
     const payload = { code: sixDigitCode, email: email, password: password };
-    const token = createToken(payload, '5min');
+    const token = createToken(payload, "5min");
 
     res
-      .cookie('toktok_verifyemail', token, {
+      .cookie("toktok_verifyemail", token, {
         httpOnly: true,
         secure: true,
+        domain: ".onrender.com",
       })
       .status(200)
       .json({ payload });
@@ -62,17 +63,17 @@ export const register = async (req, res, next) => {
       });
 
       await newUser.save();
-      res.status(201).send('User has been created');
+      res.status(201).send("User has been created");
     } catch (err) {
-      console.log('register error:', err);
+      console.log("register error:", err);
       next(err);
     }
   } else {
     res.status(401).json({
       success: false,
-      message: 'invalid token',
+      message: "invalid token",
     });
-    return next(createError(401, 'Token expired or invalid'));
+    return next(createError(401, "Token expired or invalid"));
   }
 };
 
@@ -82,28 +83,28 @@ export const login = async (req, res, next) => {
   const { email } = req.body;
   try {
     const user = await User.findOne({ email });
-    console.log('user:', user.email);
-    if (!user) return next(createError(404, 'User not found'));
+    console.log("user:", user.email);
+    if (!user) return next(createError(404, "User not found"));
 
     const isPasswordCorrect = await bcrypt.compare(
       req.body.password,
       user.password
     );
     if (!isPasswordCorrect)
-      return next(createError(400, 'Wrong password or username'));
+      return next(createError(400, "Wrong password or username"));
 
     const payload = { id: user._id };
-    const token = createToken(payload, '1h');
+    const token = createToken(payload, "1h");
 
     res
-      .cookie('toktok', token, {
+      .cookie("toktok", token, {
         httpOnly: true,
         secure: true,
       })
       .status(200)
       .json({
         success: true,
-        message: 'Login successful',
+        message: "Login successful",
       });
   } catch (err) {
     next(err);
@@ -117,9 +118,9 @@ export const logout = async (req, res, next) => {
   // console.log({ cookie });
   try {
     res
-      .clearCookie('toktok')
+      .clearCookie("toktok")
       .status(200)
-      .json({ success: true, message: 'Logout successful' });
+      .json({ success: true, message: "Logout successful" });
   } catch (err) {
     next(err);
   }
