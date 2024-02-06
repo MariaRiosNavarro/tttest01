@@ -32,7 +32,7 @@ export const signUp = async (req, res, next) => {
       .cookie("toktok_verifyemail", token, {
         httpOnly: true,
         secure: true,
-        domain: ".onrender.com",
+        // domain: ".onrender.com",
       })
       .status(200)
       .json({ payload });

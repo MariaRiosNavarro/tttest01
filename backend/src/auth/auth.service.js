@@ -4,7 +4,7 @@ import { randomBytes } from "node:crypto";
 export function createToken(payload, expiresIn) {
   return jwt.sign(payload, process.env.JWT_SECRET, {
     expiresIn: expiresIn,
-    domain: ".onrender.com",
+    // domain: ".onrender.com",
   });
 }
 
